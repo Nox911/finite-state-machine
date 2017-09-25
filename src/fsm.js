@@ -10,6 +10,8 @@ class FSM {
          this.initial = config.initial;
          this.st=config.initial;
          this.states=config.states;
+         this.transitions=['normal'];
+         this.count=0;
     }
 
     /**
@@ -45,7 +47,10 @@ class FSM {
 
             default :
             return err;
-        }      
+        }  
+        this.transitions.splice(this.count+1 , this.transitions.length);
+        this.transitions.push(this.st);
+        this.count++;   
     }
 
     /**
@@ -94,6 +99,9 @@ class FSM {
             return Err;
             
        }
+       this.transitions.splice(this.count+1 , this.transitions.length);
+       this.transitions.push(this.st);
+       this.count++;
     }
 
     /**
@@ -149,19 +157,40 @@ class FSM {
      * Returns false if undo is not available.
      * @returns {Boolean}
      */
-    undo() {}
+    undo() {
+
+     if((this.transitions.length<1) || (this.count<1)) {
+        return false;
+     }       
+
+     this.count--;
+     this.st=this.transitions[this.count];
+     return true;
+
+    }
 
     /**
      * Goes redo to state.
      * Returns false if redo is not available.
      * @returns {Boolean}
      */
-    redo() {}
+    redo() {
+        if ((this.transitions.length<2)||(this.count==(this.transitions.length-1))) {
+            return false;
+        }
+
+        this.count++;
+        this.st=this.transitions[this.count];
+        return true;
+    }
 
     /**
      * Clears transition history
      */
-    clearHistory() {}
+    clearHistory() {
+        this.transitions=['normal'];
+        this.count=0;
+    }
 }
 
 module.exports = FSM;
