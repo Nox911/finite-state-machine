@@ -4,7 +4,7 @@
 	  * @param config
 	     */
 	    constructor(config) {
-	         if (arguments[0]==undefined) {
+	         if (arguments[0]===undefined) {
 	            return Err;
 	         }
 	         this.initial = config.initial;
@@ -29,29 +29,16 @@
 	     */
 	    changeState(state) {
 
-	        switch(state) {
-	            case 'busy':
-	            this.st='busy';
-	            break;
-
-	            case 'sleeping' :
-	            this.st='sleeping';
-	            break;
-
-	            case 'hungry':
-	            this.st='hungry';
-	            break;
-
-	            case 'normal':
-	             this.st='normal';
-	            break;
-
-	            default :
-	            return err;
-	        }  
-	        this.transitions.splice(this.count+1 , this.transitions.length);
-	        this.transitions.push(this.st);
-	        this.count++;   
+	    	for (var key in this.states) {
+	    		if	(key===state ) {
+	    			this.st = state;}
+	    		}
+	    		if (this.st!==state) {
+	    			return Err;
+	    		}
+	      this.transitions.splice(this.count+1 , this.transitions.length);
+	      this.transitions.push(this.st);
+	      this.count++;   
 	    }
 
 	    /**
@@ -59,48 +46,17 @@
 	     * @param event
 	     */
 	    trigger(event) {
-	    	var trans=event;
+	    	var Errr=0;;
 
-	        switch(event) {
-	            case 'study':
-	            if (this.st=='normal'){
-	                this.st='busy';
-	            }
-	            else {return Err;}
-	            break;
+	   			for (var key in this.states[this.st].transitions) {
+	   				if  (key===event) {
+	   					this.st=this.states[this.st].transitions[key];
+	   					Errr++;
+	   				}
+	   			}
+	    		if (Errr!==1) {
+	    			return Err;}
 
-	            case 'get_tired':
-	            if (this.st=='busy') {
-	                this.st='sleeping';
-	            }
-	            else{return Err;}
-	            break;
-
-	            case 'get_up':
-	            if (this.st=='sleeping') {
-	                this.st='normal';
-	            }
-	            else {return Err;}
-	            break;
-
-	            case 'get_hungry':
-	            if ((this.st=='busy')||(this.st=='sleeping')) {
-	                this.st='hungry';
-	            }
-	            else {return Err;}   
-	            break;
-
-	            case 'eat':
-	            if (this.st=='hungry') {
-	                this.st='normal';
-	            }
-	            else {return Err;}
-	            break;
-
-	            default:
-	            return Err;
-	            
-	       }
 	       this.transitions.splice(this.count+1 , this.transitions.length);
 	       this.transitions.push(this.st);
 	       this.count++;
@@ -121,38 +77,20 @@
 	     * @returns {Array}
 	     */
 	    getStates(event) {
-	        var arr=[];
-	        switch (event) {
-	            case undefined:
-	            arr.push('normal','busy','hungry','sleeping');
-	            break;
+	      var arr=[];
 
-	            case 'study':
-	            arr.push('normal');
-	            break;
-
-	            case 'get_tired':
-	            arr.push('busy');
-	            break;
-
-	            case 'get_up':
-	            arr.push('sleeping');
-	            break;
-
-	            case 'get_hungry':
-	            arr.push('busy','sleeping');  
-	            break;
-
-	            case 'eat':
-	            arr.push('hungry');            
-	            break;
-
-	            default:
-	            
+	      for (var key in this.states) {
+	        if (event===undefined) {
+	        	arr.push(key);
 	        }
-	        return arr;
-
-	    }
+	        for (var keykey in this.states[key].transitions){
+	        	if (event === keykey) {
+	        		arr.push(key);
+	        	}
+	        }
+	      }
+	    	return arr;
+			}
 
 	    /**
 	     * Goes back to previous state.
@@ -177,7 +115,7 @@
 	     * @returns {Boolean}
 	     */
 	    redo() {
-	        if ((this.transitions.length<2)||(this.count==(this.transitions.length-1))) {
+	        if ((this.transitions.length<2)||(this.count===(this.transitions.length-1))) {
 	            return false;
 	        }
 
@@ -190,7 +128,7 @@
 	     * Clears transition history
 	     */
 	    clearHistory() {
-	        this.transitions=['normal'];
+	        this.transitions=[this.initial];
 	        this.count=0;
 	    }
 	}
